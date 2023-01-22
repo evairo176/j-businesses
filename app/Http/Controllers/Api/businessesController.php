@@ -108,7 +108,7 @@ class businessesController extends Controller
             "businesses" => $businesses
         ], 200);
     }
-    public function fetchDataByParams($search = null, $limit = null, $sortBy = null)
+    public function fetchDataByParams($field = null, $keyword = null,  $sortBy = null, $limit = null,)
     {
         $dataSort = [
             'alias',
@@ -128,7 +128,6 @@ class businessesController extends Controller
             'distance',
         ];
 
-        $keyword = $search;
         if (!in_array($sortBy, $dataSort)) {
             return response()->json([
                 "success" => false,
@@ -137,10 +136,8 @@ class businessesController extends Controller
             ], 404);
         }
 
-        $businesses = Businesses::where(function ($query) use ($keyword) {
-            $query->where('alias', 'like', '%' . $keyword . '%')
-                ->orWhere('name', 'like', '%' . $keyword . '%');
-        })->orderBy($sortBy)
+        $businesses = Businesses::where($field, 'like', '%' . $keyword . '%')
+            ->orderBy($sortBy)
             ->paginate($limit);
 
         return response()->json([
@@ -152,7 +149,7 @@ class businessesController extends Controller
     public function fetchAllData()
     {
 
-        $businesses = Businesses::paginate(100);
+        $businesses = Businesses::all();
 
         return response()->json([
             "success" => true,
